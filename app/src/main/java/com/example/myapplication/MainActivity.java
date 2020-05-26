@@ -4,30 +4,33 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FloatingActionButton mFloatingActionButton;
     private TextView mCountTextView;
-
-    private int count;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFloatingActionButton = findViewById(R.id.fab);
         mCountTextView = findViewById(R.id.count_text_view);
 
-        mCountTextView.setText(count + "");
+        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        mFloatingActionButton.setOnClickListener(v -> {
-            // 여기
-            count++;
-            mCountTextView.setText(count + "");
-        });
+        // 알아서 UI 업데이트
+        viewModel.countLiveData.observe(this, count -> updateUI(count));
+
+        // 데이터를 변경하는 부분
+        findViewById(R.id.fab).setOnClickListener(v -> viewModel.increase());
+        findViewById(R.id.decrease_button).setOnClickListener(v -> viewModel.decrease());
     }
+
+    private void updateUI(int count) {
+        mCountTextView.setText(count + "");
+    }
+
+
 }
